@@ -1,118 +1,177 @@
-const Arrow = () => <span aria-hidden="true">↗</span>;
+"use client";
+
+import { useEffect, useState } from "react";
+
+const sectionIds = ["about", "education", "experience", "projects"];
+
+const projects = [
+  {
+    number: "01",
+    title: "Personal Portfolio",
+    type: "Web development",
+    summary: "An evolving digital résumé designed and built to present my work, interests, and growth as a computer science student.",
+    stack: ["React", "TypeScript", "CSS"],
+  },
+  {
+    number: "02",
+    title: "Coursework Archive",
+    type: "Computer science",
+    summary: "A growing collection of programming labs, technical exercises, and small experiments from my studies at UCSC.",
+    stack: ["Algorithms", "Data structures", "Problem solving"],
+  },
+];
 
 export default function Home() {
+  const [openProject, setOpenProject] = useState(0);
+  const [activeSection, setActiveSection] = useState(0);
+
+  useEffect(() => {
+    const panel = document.querySelector(".scrollPanel");
+    if (!panel) return;
+
+    const updateSection = () => {
+      const center = panel.getBoundingClientRect().top + panel.clientHeight / 2;
+      const closest = sectionIds.reduce((best, id, index) => {
+        const rect = document.getElementById(id)!.getBoundingClientRect();
+        const sectionCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(sectionCenter - center);
+        return distance < best.distance ? { index, distance } : best;
+      }, { index: 0, distance: Infinity });
+      setActiveSection(closest.index);
+    };
+
+    panel.addEventListener("scroll", updateSection, { passive: true });
+    updateSection();
+    return () => panel.removeEventListener("scroll", updateSection);
+  }, []);
+
   return (
-    <main>
-      <nav className="nav" aria-label="Main navigation">
-        <a className="brand" href="#top" aria-label="Samin Salman, home">
-          SS<span>.</span>
-        </a>
-        <div className="navLinks">
-          <a href="#about">About</a>
-          <a href="#work">Work</a>
-          <a href="#contact">Contact</a>
+    <main className="splitResume">
+      <aside className="introPanel">
+        <div className="introTop">
+          <span className="tinyLogo">SS<span>●</span></span>
+          <span className="status"><i /> Available for internships</span>
         </div>
+
+        <div className="portraitWrap" aria-label="Portrait placeholder for Samin Salman">
+          <div className="portraitBlob">
+            <span>SS</span>
+            <div className="portraitGrid" aria-hidden="true" />
+          </div>
+          <span className="orbit orbitOne" aria-hidden="true" />
+          <span className="orbit orbitTwo" aria-hidden="true" />
+        </div>
+
+        <div className="introCopy">
+          <p className="hello">Hello, I’m</p>
+          <h1>Samin<br />Salman<span>.</span></h1>
+          <p className="bio">Computer Science B.S. student at UC Santa Cruz, learning to build thoughtful software and solve meaningful problems.</p>
+        </div>
+
+        <div className="introBottom">
+          <nav aria-label="Jump to résumé section">
+            <a href="#about">About</a>
+            <a href="#education">Education</a>
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
+          </nav>
+          <div className="contactLinks">
+            <span>Let’s connect</span>
+            <a href="https://github.com/Samsal7" target="_blank" rel="noreferrer">GitHub ↗</a>
+            <span>Email available on request</span>
+          </div>
+        </div>
+      </aside>
+
+      <nav className={`sectionTrack active-${activeSection}`} aria-label="Résumé progress">
+        <span className="trackMarker" aria-hidden="true" />
+        {sectionIds.map((id, index) => (
+          <button
+            key={id}
+            className={activeSection === index ? "active" : ""}
+            onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })}
+            aria-label={`Go to ${id}`}
+            aria-current={activeSection === index ? "step" : undefined}
+          >
+            <i />
+            <span>{String(index + 1).padStart(2, "0")} · {id}</span>
+          </button>
+        ))}
       </nav>
 
-      <section className="hero" id="top">
-        <div className="eyebrow"><i /> Computer Science · UC Santa Cruz</div>
-        <h1>
-          I build thoughtful<br />
-          <em>digital experiences.</em>
-        </h1>
-        <div className="heroBottom">
-          <p>
-            I’m Samin Salman, a Computer Science B.S. student interested in
-            turning ideas into useful, well-crafted software.
-          </p>
-          <a className="roundLink" href="#work" aria-label="See my work">
-            <span>See my work</span><Arrow />
-          </a>
-        </div>
-        <div className="heroMark" aria-hidden="true">S</div>
-      </section>
+      <div className="scrollPanel">
+        <div className="scrollHint"><span>Scroll résumé</span><i>↓</i></div>
 
-      <section className="section about" id="about">
-        <p className="sectionLabel">01 / About</p>
-        <div className="aboutGrid">
-          <h2>Curious by nature.<br />Technical by choice.</h2>
-          <div className="aboutCopy">
-            <p>
-              I’m currently studying Computer Science at UC Santa Cruz, where
-              I’m building a strong foundation in software development,
-              algorithms, and problem solving.
-            </p>
-            <p>
-              I care about the details that make technology feel intuitive—from
-              clear interfaces to clean, reliable code. I’m always looking for
-              the next problem worth solving and the next person to learn from.
-            </p>
+        <section className="scrollSection aboutPage" id="about">
+          <div className="sectionTop"><span>01</span><p>Profile</p></div>
+          <div className="organicTitle">
+            <h2>Curious mind,<br /><em>technical hands.</em></h2>
+            <span className="softBlob" aria-hidden="true" />
           </div>
-        </div>
-        <div className="facts">
-          <div><strong>UCSC</strong><span>University</span></div>
-          <div><strong>CS B.S.</strong><span>Degree</span></div>
-          <div><strong>California</strong><span>Based in</span></div>
-          <div><strong>Always</strong><span>Learning</span></div>
-        </div>
-      </section>
-
-      <section className="section work" id="work">
-        <div className="workHeading">
-          <p className="sectionLabel">02 / Selected work</p>
-          <h2>Projects in progress.</h2>
-          <p>A growing collection of things I’m learning, designing, and building.</p>
-        </div>
-        <div className="projectGrid">
-          <article className="project featured">
-            <div className="projectVisual visualOne"><span>SS</span></div>
-            <div className="projectMeta">
-              <div><span className="tag">Web development</span><h3>Personal Portfolio</h3></div>
-              <p>A fast, responsive home for my work, story, and growth as a developer.</p>
-            </div>
-          </article>
-          <article className="project">
-            <div className="projectVisual visualTwo"><span>01</span><span>101</span><span>10</span></div>
-            <div className="projectMeta">
-              <div><span className="tag">Computer science</span><h3>Coursework & Experiments</h3></div>
-              <p>Selected technical exercises and explorations from my studies at UCSC.</p>
-            </div>
-          </article>
-          <article className="project projectNext">
-            <div className="projectVisual visualThree"><span>Next<br />up</span></div>
-            <div className="projectMeta">
-              <div><span className="tag">Coming soon</span><h3>The Next Build</h3></div>
-              <p>This space is ready for the next idea I turn into something real.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section className="section learning">
-        <p className="sectionLabel">03 / Toolkit</p>
-        <div className="learningGrid">
-          <h2>What I’m<br />working with.</h2>
-          <div className="skillList">
-            <div><span>01</span><strong>Programming fundamentals</strong></div>
-            <div><span>02</span><strong>Data structures & algorithms</strong></div>
-            <div><span>03</span><strong>Web development</strong></div>
-            <div><span>04</span><strong>Problem solving</strong></div>
+          <div className="aboutColumns">
+            <p>I’m a computer science student who enjoys understanding how things work, then finding ways to make them clearer, faster, or more useful.</p>
+            <p>My interests live where logical systems meet human experience—from reliable code and algorithms to interfaces that feel natural to use.</p>
           </div>
-        </div>
-      </section>
+          <div className="quickFacts">
+            <div><strong>UCSC</strong><span>University</span></div>
+            <div><strong>CS B.S.</strong><span>Degree</span></div>
+            <div><strong>CA</strong><span>Based</span></div>
+          </div>
+        </section>
 
-      <footer id="contact">
-        <p className="sectionLabel">04 / Contact</p>
-        <h2>Let’s build something<br /><em>worth sharing.</em></h2>
-        <p className="contactCopy">I’m open to internships, collaborations, and conversations with people building interesting things.</p>
-        <a className="contactLink" href="https://www.linkedin.com" target="_blank" rel="noreferrer">
-          Connect on LinkedIn <Arrow />
-        </a>
-        <div className="footerBottom">
-          <span>© 2026 Samin Salman</span>
-          <a href="#top">Back to top ↑</a>
-        </div>
-      </footer>
+        <section className="scrollSection educationPage" id="education">
+          <div className="sectionTop"><span>02</span><p>Education</p></div>
+          <div className="educationCard">
+            <div className="ucscSeal" aria-hidden="true">UC<br />SC</div>
+            <div>
+              <span className="datePill">Present</span>
+              <h2>B.S. Computer Science</h2>
+              <h3>University of California, Santa Cruz</h3>
+              <p>Developing a strong foundation in programming, data structures, algorithms, systems thinking, and collaborative problem solving.</p>
+            </div>
+          </div>
+          <div className="courseCloud" aria-label="Areas of study">
+            <span>Algorithms</span><span>Data structures</span><span>Software development</span>
+            <span>Programming fundamentals</span><span>Problem solving</span>
+          </div>
+        </section>
+
+        <section className="scrollSection experiencePage" id="experience">
+          <div className="sectionTop"><span>03</span><p>Experience</p></div>
+          <div className="experienceIntro">
+            <h2>Building the<br /><em>foundation.</em></h2>
+            <p>I’m currently focused on academic work, independent projects, and preparing for my first professional software opportunity.</p>
+          </div>
+          <div className="experienceLine">
+            <span className="lineDot" />
+            <div><small>Now</small><h3>Computer Science Student</h3><p>Learning through coursework, technical labs, and hands-on building at UC Santa Cruz.</p></div>
+          </div>
+          <div className="experienceLine muted">
+            <span className="lineDot" />
+            <div><small>Next</small><h3>Internship Opportunity</h3><p>Looking to contribute, learn from a strong team, and turn fundamentals into real-world impact.</p></div>
+          </div>
+        </section>
+
+        <section className="scrollSection projectsPage" id="projects">
+          <div className="sectionTop"><span>04</span><p>Selected projects</p></div>
+          <h2>Things I’m<br /><em>making & learning.</em></h2>
+          <div className="projectAccordion">
+            {projects.map((project, index) => (
+              <article className={openProject === index ? "open" : ""} key={project.title}>
+                <button onClick={() => setOpenProject(index)} aria-expanded={openProject === index}>
+                  <span>{project.number}</span><strong>{project.title}</strong><i>{openProject === index ? "−" : "+"}</i>
+                </button>
+                <div className="projectReveal">
+                  <span className="projectType">{project.type}</span>
+                  <p>{project.summary}</p>
+                  <div>{project.stack.map((item) => <span key={item}>{item}</span>)}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="endNote"><span>More soon</span><p>This résumé grows as I do.</p></div>
+        </section>
+      </div>
     </main>
   );
 }
